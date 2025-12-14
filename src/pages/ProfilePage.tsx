@@ -1,5 +1,5 @@
 import type { Component } from "solid-js";
-import { createSignal, onMount } from "solid-js";
+import { createSignal } from "solid-js";
 import { authService } from "../utils/auth";
 import type {
   User,

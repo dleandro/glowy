@@ -70,7 +70,7 @@ export const mockProducts: Product[] = [
     priceComparison: [
       {
         store: "Sephora",
-        price: 42.0,
+        price: 42,
         currency: "EUR",
         url: "https://sephora.com",
         availability: "in_stock",
