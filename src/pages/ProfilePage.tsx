@@ -1,0 +1,314 @@
+import type { Component } from "solid-js";
+import { createSignal, onMount } from "solid-js";
+import { authService } from "../utils/auth";
+import type {
+  User,
+  SkinType,
+  SkinTone,
+  SkinConcern,
+  AgeRange,
+  HairType,
+} from "../types";
+
+interface ProfilePageProps {
+  user: User;
+  onBack: () => void;
+  onLogout: () => void;
+  onProfileUpdated: (user: User) => void;
+}
+
+const ProfilePage: Component<ProfilePageProps> = (props) => {
+  const [name, setName] = createSignal(props.user.name);
+  const [skinType, setSkinType] = createSignal<SkinType>(
+    props.user.profile.skinType
+  );
+  const [skinTone, setSkinTone] = createSignal<SkinTone>(
+    props.user.profile.skinTone
+  );
+  const [skinConcerns, setSkinConcerns] = createSignal<SkinConcern[]>(
+    props.user.profile.skinConcerns
+  );
+  const [ageRange, setAgeRange] = createSignal<AgeRange>(
+    props.user.profile.ageRange
+  );
+  const [hairType, setHairType] = createSignal<HairType | undefined>(
+    props.user.profile.hairType
+  );
+
+  const [success, setSuccess] = createSignal(false);
+  const [loading, setLoading] = createSignal(false);
+
+  const toggleSkinConcern = (concern: SkinConcern) => {
+    setSkinConcerns((prev) =>
+      prev.includes(concern)
+        ? prev.filter((c) => c !== concern)
+        : [...prev, concern]
+    );
+  };
+
+  const handleSubmit = (e: Event) => {
+    e.preventDefault();
+    setLoading(true);
+    setSuccess(false);
+
+    const updatedUser = authService.updateUser(props.user.id, {
+      name: name(),
+      profile: {
+        skinType: skinType(),
+        skinTone: skinTone(),
+        skinConcerns: skinConcerns(),
+        ageRange: ageRange(),
+        hairType: hairType(),
+        preferredBrands: props.user.profile.preferredBrands,
+        allergies: props.user.profile.allergies,
+      },
+    });
+
+    if (updatedUser) {
+      props.onProfileUpdated(updatedUser);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    }
+
+    setLoading(false);
+  };
+
+  const handleLogout = () => {
+    authService.logout();
+    props.onLogout();
+  };
+
+  return (
+    <div class="min-h-screen bg-[#e8e4df] py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl mx-auto">
+        <div class="mb-6">
+          <button
+            onClick={props.onBack}
+            class="flex items-center text-gray-700 hover:text-pink-600"
+          >
+            <svg
+              class="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Home
+          </button>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-8">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-4">
+              <img
+                src={props.user.avatar}
+                alt={props.user.name}
+                class="h-16 w-16 rounded-full"
+              />
+              <div>
+                <h2 class="text-2xl font-bold text-gray-900">My Profile</h2>
+                <p class="text-sm text-gray-600">{props.user.email}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              class="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 border border-red-300 rounded-md hover:bg-red-50"
+            >
+              Logout
+            </button>
+          </div>
+
+          {success() && (
+            <div class="mb-6 rounded-md bg-green-50 p-4">
+              <div class="text-sm text-green-800">
+                Profile updated successfully!
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} class="space-y-6">
+            {/* Basic Information */}
+            <div class="space-y-4">
+              <h3 class="text-lg font-medium text-gray-900 border-b pb-2">
+                Basic Information
+              </h3>
+
+              <div>
+                <label
+                  for="name"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  required
+                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                  value={name()}
+                  onInput={(e) => setName(e.currentTarget.value)}
+                />
+              </div>
+            </div>
+
+            {/* Beauty Profile */}
+            <div class="space-y-4">
+              <h3 class="text-lg font-medium text-gray-900 border-b pb-2">
+                Your Beauty Profile
+              </h3>
+
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="skin-type"
+                    class="block text-sm font-medium text-gray-700"
+                  >
+                    Skin Type
+                  </label>
+                  <select
+                    id="skin-type"
+                    required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                    value={skinType()}
+                    onChange={(e) =>
+                      setSkinType(e.currentTarget.value as SkinType)
+                    }
+                  >
+                    <option value="oily">Oily</option>
+                    <option value="dry">Dry</option>
+                    <option value="combination">Combination</option>
+                    <option value="sensitive">Sensitive</option>
+                    <option value="normal">Normal</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="skin-tone"
+                    class="block text-sm font-medium text-gray-700"
+                  >
+                    Skin Tone
+                  </label>
+                  <select
+                    id="skin-tone"
+                    required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                    value={skinTone()}
+                    onChange={(e) =>
+                      setSkinTone(e.currentTarget.value as SkinTone)
+                    }
+                  >
+                    <option value="fair">Fair</option>
+                    <option value="light">Light</option>
+                    <option value="medium">Medium</option>
+                    <option value="tan">Tan</option>
+                    <option value="deep">Deep</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Skin Concerns (select all that apply)
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                  {(
+                    [
+                      "acne",
+                      "aging",
+                      "dryness",
+                      "oiliness",
+                      "sensitivity",
+                      "dark_spots",
+                      "redness",
+                      "large_pores",
+                    ] as SkinConcern[]
+                  ).map((concern) => (
+                    <label class="flex items-center">
+                      <input
+                        type="checkbox"
+                        class="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+                        checked={skinConcerns().includes(concern)}
+                        onChange={() => toggleSkinConcern(concern)}
+                      />
+                      <span class="ml-2 text-sm text-gray-700 capitalize">
+                        {concern.replace("_", " ")}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="age-range"
+                    class="block text-sm font-medium text-gray-700"
+                  >
+                    Age Range
+                  </label>
+                  <select
+                    id="age-range"
+                    required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                    value={ageRange()}
+                    onChange={(e) =>
+                      setAgeRange(e.currentTarget.value as AgeRange)
+                    }
+                  >
+                    <option value="16-25">16-25</option>
+                    <option value="26-35">26-35</option>
+                    <option value="36-45">36-45</option>
+                    <option value="46-55">46-55</option>
+                    <option value="55+">55+</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="hair-type"
+                    class="block text-sm font-medium text-gray-700"
+                  >
+                    Hair Type
+                  </label>
+                  <select
+                    id="hair-type"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                    value={hairType() || "straight"}
+                    onChange={(e) =>
+                      setHairType(e.currentTarget.value as HairType)
+                    }
+                  >
+                    <option value="straight">Straight</option>
+                    <option value="wavy">Wavy</option>
+                    <option value="curly">Curly</option>
+                    <option value="coily">Coily</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex space-x-4">
+              <button
+                type="submit"
+                disabled={loading()}
+                class="flex-1 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
+              >
+                {loading() ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProfilePage;
