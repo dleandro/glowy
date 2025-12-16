@@ -11,6 +11,10 @@ import {
   additionalProducts3,
   additionalReviews,
 } from "../utils/additionalProducts";
+import {
+  enhancedReviews,
+  generatePriceComparisons,
+} from "../utils/enhancedData";
 
 // Combine all products and reviews
 const allProducts = [
@@ -19,6 +23,15 @@ const allProducts = [
   ...additionalProducts2,
   ...additionalProducts3,
 ];
+
+// Enhance products with multiple price comparisons
+allProducts.forEach((product) => {
+  // If product has only 1-2 stores, add more
+  if (product.priceComparison.length < 3) {
+    const basePrice = product.priceComparison[0]?.price || 25;
+    product.priceComparison = generatePriceComparisons(basePrice, product.id);
+  }
+});
 
 // Load reviews from localStorage or use default reviews
 const loadReviews = () => {
@@ -35,7 +48,7 @@ const loadReviews = () => {
       console.error("Error loading reviews from localStorage:", e);
     }
   }
-  return [...mockReviews, ...additionalReviews];
+  return [...mockReviews, ...additionalReviews, ...enhancedReviews];
 };
 
 const allReviews = loadReviews();
