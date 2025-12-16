@@ -5,6 +5,7 @@ import { authService } from "../utils/auth";
 interface LoginPageProps {
   onLoginSuccess: () => void;
   onSwitchToRegister: () => void;
+  onBackToHome?: () => void;
 }
 
 const LoginPage: Component<LoginPageProps> = (props) => {
@@ -33,6 +34,25 @@ const LoginPage: Component<LoginPageProps> = (props) => {
     <div class="min-h-screen bg-[#e8e4df] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-md w-full space-y-8">
         <div>
+          <button
+            onClick={props.onBackToHome}
+            class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Home
+          </button>
           <img
             class="mx-auto h-20 w-auto"
             src="/images/glowy-logo.png"

@@ -12,6 +12,7 @@ import type {
 interface RegisterPageProps {
   onRegisterSuccess: () => void;
   onSwitchToLogin: () => void;
+  onBackToHome?: () => void;
 }
 
 const RegisterPage: Component<RegisterPageProps> = (props) => {
@@ -79,6 +80,25 @@ const RegisterPage: Component<RegisterPageProps> = (props) => {
     <div class="min-h-screen bg-[#e8e4df] py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-2xl mx-auto">
         <div class="text-center mb-8">
+          <button
+            onClick={props.onBackToHome}
+            class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Home
+          </button>
           <img
             class="mx-auto h-16 w-auto"
             src="/images/glowy-logo.png"

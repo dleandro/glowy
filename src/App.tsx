@@ -93,6 +93,7 @@ const App: Component = () => {
         <LoginPage
           onLoginSuccess={handleLoginSuccess}
           onSwitchToRegister={() => setCurrentView("register")}
+          onBackToHome={handleBackToHome}
         />
       </Show>
 
@@ -100,6 +101,7 @@ const App: Component = () => {
         <RegisterPage
           onRegisterSuccess={handleLoginSuccess}
           onSwitchToLogin={() => setCurrentView("login")}
+          onBackToHome={handleBackToHome}
         />
       </Show>
 
