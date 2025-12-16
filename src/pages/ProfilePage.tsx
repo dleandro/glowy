@@ -84,7 +84,7 @@ const ProfilePage: Component<ProfilePageProps> = (props) => {
         <div class="mb-6">
           <button
             onClick={props.onBack}
-            class="flex items-center text-gray-700 hover:text-pink-600"
+            class="flex items-center text-gray-700 hover:text-pink-600 cursor-pointer"
           >
             <svg
               class="h-5 w-5 mr-2"

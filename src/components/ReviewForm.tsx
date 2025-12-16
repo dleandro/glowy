@@ -77,7 +77,7 @@ const ReviewForm: Component<ReviewFormProps> = (props) => {
               onClick={() => setRating(star)}
               onMouseEnter={() => setHoveredRating(star)}
               onMouseLeave={() => setHoveredRating(0)}
-              class="focus:outline-none"
+              class="focus:outline-none cursor-pointer"
             >
               <svg
                 class={`h-8 w-8 ${
@@ -177,14 +177,14 @@ const ReviewForm: Component<ReviewFormProps> = (props) => {
       <div class="flex space-x-3 pt-4">
         <button
           type="submit"
-          class="flex-1 bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+          class="flex-1 bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 cursor-pointer"
         >
           {props.existingReview ? "Update Review" : "Submit Review"}
         </button>
         <button
           type="button"
           onClick={props.onCancel}
-          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
         >
           Cancel
         </button>

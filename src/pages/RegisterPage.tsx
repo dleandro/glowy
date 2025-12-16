@@ -7,10 +7,11 @@ import type {
   SkinConcern,
   AgeRange,
   HairType,
+  User,
 } from "../types";
 
 interface RegisterPageProps {
-  onRegisterSuccess: () => void;
+  onRegisterSuccess: (user: User) => void;
   onSwitchToLogin: () => void;
   onBackToHome?: () => void;
 }
@@ -68,7 +69,7 @@ const RegisterPage: Component<RegisterPageProps> = (props) => {
 
     if (user) {
       authService.login(email(), password());
-      props.onRegisterSuccess();
+      props.onRegisterSuccess(user);
     } else {
       setError("Email already registered");
     }
@@ -77,12 +78,12 @@ const RegisterPage: Component<RegisterPageProps> = (props) => {
   };
 
   return (
-    <div class="min-h-screen bg-[#e8e4df] py-12 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-[#f3f2ed] py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-2xl mx-auto">
         <div class="text-center mb-8">
           <button
             onClick={props.onBackToHome}
-            class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 cursor-pointer"
           >
             <svg
               class="h-5 w-5"
@@ -111,7 +112,7 @@ const RegisterPage: Component<RegisterPageProps> = (props) => {
             Already have an account?{" "}
             <button
               onClick={props.onSwitchToLogin}
-              class="font-medium text-pink-600 hover:text-pink-500"
+              class="font-medium text-pink-600 hover:text-pink-500 cursor-pointer"
             >
               Sign in
             </button>
@@ -219,7 +220,7 @@ const RegisterPage: Component<RegisterPageProps> = (props) => {
                 <select
                   id="skin-type"
                   required
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 cursor-pointer"
                   value={skinType()}
                   onChange={(e) =>
                     setSkinType(e.currentTarget.value as SkinType)
@@ -243,7 +244,7 @@ const RegisterPage: Component<RegisterPageProps> = (props) => {
                 <select
                   id="skin-tone"
                   required
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 cursor-pointer"
                   value={skinTone()}
                   onChange={(e) =>
                     setSkinTone(e.currentTarget.value as SkinTone)
@@ -302,7 +303,7 @@ const RegisterPage: Component<RegisterPageProps> = (props) => {
                 <select
                   id="age-range"
                   required
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 cursor-pointer"
                   value={ageRange()}
                   onChange={(e) =>
                     setAgeRange(e.currentTarget.value as AgeRange)
@@ -325,7 +326,7 @@ const RegisterPage: Component<RegisterPageProps> = (props) => {
                 </label>
                 <select
                   id="hair-type"
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 cursor-pointer"
                   value={hairType()}
                   onChange={(e) =>
                     setHairType(e.currentTarget.value as HairType)
@@ -344,7 +345,7 @@ const RegisterPage: Component<RegisterPageProps> = (props) => {
             <button
               type="submit"
               disabled={loading()}
-              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
+              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 cursor-pointer"
             >
               {loading() ? "Creating account..." : "Create account"}
             </button>

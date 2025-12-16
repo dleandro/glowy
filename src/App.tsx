@@ -7,8 +7,12 @@ import ProductDetail from "./pages/ProductDetail";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
-import { appStore } from "./stores/appStore";
-import { authService } from "./utils/auth";
+import {
+  checkInitialAuth,
+  currentUser,
+  loginUser,
+  logoutUser,
+} from "./stores/appStore";
 import "./App.css";
 
 type View = "home" | "product-detail" | "login" | "register" | "profile";
@@ -20,12 +24,7 @@ const App: Component = () => {
   );
 
   // Load user from localStorage on mount
-  onMount(() => {
-    const user = authService.getCurrentUser();
-    if (user) {
-      appStore.setCurrentUser(user);
-    }
-  });
+  onMount(checkInitialAuth);
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
@@ -43,28 +42,25 @@ const App: Component = () => {
   };
 
   const handleProfileClick = () => {
-    if (appStore.currentUser()) {
+    if (currentUser()) {
       setCurrentView("profile");
     } else {
       setCurrentView("login");
     }
   };
 
-  const handleLoginSuccess = () => {
-    const user = authService.getCurrentUser();
-    if (user) {
-      appStore.setCurrentUser(user);
-    }
+  const handleLoginSuccess = (user: User) => {
+    loginUser(user);
     setCurrentView("home");
   };
 
   const handleLogout = () => {
-    appStore.setCurrentUser(null);
+    logoutUser();
     setCurrentView("home");
   };
 
   const handleProfileUpdated = (user: User) => {
-    appStore.setCurrentUser(user);
+    loginUser(user);
   };
 
   return (
@@ -105,9 +101,9 @@ const App: Component = () => {
         />
       </Show>
 
-      <Show when={currentView() === "profile" && appStore.currentUser()}>
+      <Show when={currentView() === "profile" && currentUser()}>
         <ProfilePage
-          user={appStore.currentUser()!}
+          user={currentUser()!}
           onBack={handleBackToHome}
           onLogout={handleLogout}
           onProfileUpdated={handleProfileUpdated}

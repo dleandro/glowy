@@ -1,9 +1,17 @@
 import type { Component } from "solid-js";
 import { Show, For, createSignal } from "solid-js";
-import type { Product, Review } from "../types";
+import type { Product, Review, User } from "../types";
 import ReviewSection from "../components/ReviewSection";
 import ReviewForm from "../components/ReviewForm";
-import { appStore } from "../stores/appStore";
+import UserProfileModal from "../components/UserProfileModal";
+import {
+  currentUser,
+  reviews as allReviews,
+  influencerReviews as allInfluencerReviews,
+  addReview,
+  updateReview,
+  deleteReview,
+} from "../stores/appStore";
 
 interface ProductDetailProps {
   product: Product;
@@ -17,19 +25,22 @@ const ProductDetail: Component<ProductDetailProps> = (props) => {
   const [editingReview, setEditingReview] = createSignal<Review | undefined>(
     undefined
   );
+  const [selectedUser, setSelectedUser] = createSignal<User | null>(null);
+  const [showUserProfile, setShowUserProfile] = createSignal(false);
 
-  const reviews = () => appStore.getProductReviews(props.product.id);
+  const reviews = () =>
+    allReviews().filter((r) => r.productId === props.product.id);
   const influencerReviews = () =>
-    appStore.getProductInfluencerReviews(props.product.id);
+    allInfluencerReviews().filter((r) => r.productId === props.product.id);
 
   const userReview = () => {
-    const user = appStore.currentUser();
+    const user = currentUser();
     if (!user) return undefined;
-    return appStore.getUserReview(props.product.id, user.id);
+    return reviews().find((r) => r.userId === user.id);
   };
 
   const handleWriteReview = () => {
-    if (!appStore.currentUser()) {
+    if (!currentUser()) {
       props.onLoginRequired?.();
       return;
     }
@@ -44,15 +55,16 @@ const ProductDetail: Component<ProductDetailProps> = (props) => {
   const handleSubmitReview = (
     reviewData: Omit<Review, "id" | "createdAt" | "helpfulVotes" | "user">
   ) => {
-    const user = appStore.currentUser();
+    const user = currentUser();
     if (!user) return;
 
     if (editingReview()) {
-      appStore.updateReview(editingReview()!.id, reviewData);
+      updateReview(editingReview()!.id, reviewData);
     } else {
-      appStore.addReview({
+      addReview(props.product.id, {
         ...reviewData,
-        user: user,
+        userId: user.id,
+        productId: props.product.id,
       });
     }
 
@@ -62,13 +74,23 @@ const ProductDetail: Component<ProductDetailProps> = (props) => {
 
   const handleDeleteReview = (reviewId: string) => {
     if (confirm("Are you sure you want to delete your review?")) {
-      appStore.deleteReview(reviewId);
+      deleteReview(reviewId);
     }
   };
 
   const handleCancelReview = () => {
     setShowReviewForm(false);
     setEditingReview(undefined);
+  };
+
+  const handleUserClick = (user: User) => {
+    setSelectedUser(user);
+    setShowUserProfile(true);
+  };
+
+  const handleCloseUserProfile = () => {
+    setShowUserProfile(false);
+    setSelectedUser(null);
   };
 
   const renderStars = (rating: number) => {
@@ -87,7 +109,7 @@ const ProductDetail: Component<ProductDetailProps> = (props) => {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <button
         onClick={props.onBack}
-        class="flex items-center text-pink-600 hover:text-pink-700 mb-6"
+        class="flex items-center text-pink-600 hover:text-pink-700 mb-6 cursor-pointer"
       >
         <svg
           class="h-5 w-5 mr-1"
@@ -279,7 +301,7 @@ const ProductDetail: Component<ProductDetailProps> = (props) => {
           <Show when={!showReviewForm()} fallback={null}>
             <button
               onClick={handleWriteReview}
-              class="flex items-center space-x-2 bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors"
+              class="flex items-center space-x-2 bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors cursor-pointer"
             >
               <svg
                 class="h-5 w-5"
@@ -305,7 +327,7 @@ const ProductDetail: Component<ProductDetailProps> = (props) => {
           <div class="mb-8">
             <ReviewForm
               productId={props.product.id}
-              userId={appStore.currentUser()!.id}
+              userId={currentUser()!.id}
               existingReview={editingReview()}
               onSubmit={handleSubmitReview}
               onCancel={handleCancelReview}
@@ -316,14 +338,22 @@ const ProductDetail: Component<ProductDetailProps> = (props) => {
         <ReviewSection
           reviews={reviews()}
           influencerReviews={influencerReviews()}
-          currentUserId={appStore.currentUser()?.id}
+          currentUserId={currentUser()?.id}
           onEditReview={(review) => {
             setEditingReview(review);
             setShowReviewForm(true);
           }}
           onDeleteReview={handleDeleteReview}
+          onUserClick={handleUserClick}
         />
       </div>
+
+      {/* User Profile Modal */}
+      <UserProfileModal
+        user={selectedUser()}
+        isOpen={showUserProfile()}
+        onClose={handleCloseUserProfile}
+      />
     </div>
   );
 };

@@ -41,6 +41,7 @@ export interface Product {
   image: string;
   images: string[];
   ingredients: string[];
+  targetGender?: "men" | "women" | "unisex";
   suitableFor: {
     skinTypes: SkinType[];
     skinTones?: SkinTone[];

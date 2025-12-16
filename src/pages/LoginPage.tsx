@@ -1,9 +1,10 @@
 import type { Component } from "solid-js";
 import { createSignal } from "solid-js";
 import { authService } from "../utils/auth";
+import type { User } from "../types";
 
 interface LoginPageProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (user: User) => void;
   onSwitchToRegister: () => void;
   onBackToHome?: () => void;
 }
@@ -22,7 +23,7 @@ const LoginPage: Component<LoginPageProps> = (props) => {
     const user = authService.login(email(), password());
 
     if (user) {
-      props.onLoginSuccess();
+      props.onLoginSuccess(user);
     } else {
       setError("Invalid email or password");
     }
@@ -31,12 +32,12 @@ const LoginPage: Component<LoginPageProps> = (props) => {
   };
 
   return (
-    <div class="min-h-screen bg-[#e8e4df] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-[#f3f2ed] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-md w-full space-y-8">
         <div>
           <button
             onClick={props.onBackToHome}
-            class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 cursor-pointer"
           >
             <svg
               class="h-5 w-5"
@@ -65,7 +66,7 @@ const LoginPage: Component<LoginPageProps> = (props) => {
             Or{" "}
             <button
               onClick={props.onSwitchToRegister}
-              class="font-medium text-pink-600 hover:text-pink-500"
+              class="font-medium text-pink-600 hover:text-pink-500 cursor-pointer"
             >
               create a new account
             </button>
@@ -118,7 +119,7 @@ const LoginPage: Component<LoginPageProps> = (props) => {
             <button
               type="submit"
               disabled={loading()}
-              class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
+              class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 cursor-pointer"
             >
               {loading() ? "Signing in..." : "Sign in"}
             </button>

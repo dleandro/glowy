@@ -1,6 +1,11 @@
 import type { Component } from "solid-js";
 import { Show, For } from "solid-js";
-import { appStore } from "../stores/appStore";
+import {
+  searchQuery,
+  setSearchQuery,
+  filteredProducts,
+  currentUser,
+} from "../stores/appStore";
 import type { Product } from "../types";
 
 interface HeaderProps {
@@ -11,11 +16,11 @@ interface HeaderProps {
 
 const Header: Component<HeaderProps> = (props) => {
   const handleSearchInput = (value: string) => {
-    appStore.setSearchQuery(value);
+    setSearchQuery(value);
   };
 
   const handleProductClick = (product: Product) => {
-    appStore.setSearchQuery("");
+    setSearchQuery("");
     props.onProductSelect?.(product);
   };
   return (
@@ -39,7 +44,7 @@ const Header: Component<HeaderProps> = (props) => {
                 type="text"
                 placeholder="Search products, brands..."
                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500"
-                value={appStore.searchQuery()}
+                value={searchQuery()}
                 onInput={(e) => handleSearchInput(e.currentTarget.value)}
               />
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -59,9 +64,9 @@ const Header: Component<HeaderProps> = (props) => {
               </div>
 
               {/* Search Results Dropdown */}
-              <Show when={appStore.searchQuery().trim().length > 0}>
+              <Show when={searchQuery().trim().length > 0}>
                 <div class="absolute top-full mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50">
-                  <For each={appStore.filteredProducts().slice(0, 5)}>
+                  <For each={filteredProducts().slice(0, 5)}>
                     {(product) => (
                       <button
                         onMouseDown={(e) => {
@@ -96,10 +101,10 @@ const Header: Component<HeaderProps> = (props) => {
                       </button>
                     )}
                   </For>
-                  <Show when={appStore.filteredProducts().length === 0}>
+                  <Show when={filteredProducts().length === 0}>
                     <div class="p-4">
                       <p class="text-sm text-gray-500 text-center">
-                        No products found matching "{appStore.searchQuery()}"
+                        No products found matching "{searchQuery()}"
                       </p>
                     </div>
                   </Show>
@@ -110,11 +115,11 @@ const Header: Component<HeaderProps> = (props) => {
 
           <div class="flex items-center space-x-4">
             <Show
-              when={appStore.currentUser()}
+              when={currentUser()}
               fallback={
                 <button
                   onClick={props.onProfileClick}
-                  class="flex items-center space-x-2 px-3 py-1.5 rounded-md text-pink-600 hover:bg-pink-50 transition-colors"
+                  class="flex items-center space-x-2 px-3 py-1.5 rounded-md text-pink-600 hover:bg-pink-50 transition-colors cursor-pointer"
                 >
                   <svg
                     class="h-6 w-6"
@@ -137,15 +142,15 @@ const Header: Component<HeaderProps> = (props) => {
             >
               <button
                 onClick={props.onProfileClick}
-                class="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                class="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
               >
                 <img
-                  src={appStore.currentUser()?.avatar}
-                  alt={appStore.currentUser()?.name}
+                  src={currentUser()?.avatar}
+                  alt={currentUser()?.name}
                   class="h-8 w-8 rounded-full border-2 border-pink-600"
                 />
                 <span class="text-sm font-medium text-gray-700 hidden sm:inline">
-                  {appStore.currentUser()?.name}
+                  {currentUser()?.name}
                 </span>
               </button>
             </Show>

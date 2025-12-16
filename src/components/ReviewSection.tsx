@@ -1,6 +1,6 @@
 import type { Component } from "solid-js";
 import { For, Show } from "solid-js";
-import type { Review, InfluencerReview } from "../types";
+import type { Review, InfluencerReview, User } from "../types";
 
 interface ReviewSectionProps {
   reviews: Review[];
@@ -8,6 +8,7 @@ interface ReviewSectionProps {
   currentUserId?: string;
   onEditReview?: (review: Review) => void;
   onDeleteReview?: (reviewId: string) => void;
+  onUserClick?: (user: User) => void;
 }
 
 const ReviewSection: Component<ReviewSectionProps> = (props) => {
@@ -131,19 +132,27 @@ const ReviewSection: Component<ReviewSectionProps> = (props) => {
               {(review) => (
                 <div class="bg-white p-6 rounded-lg border border-gray-200">
                   <div class="flex items-start space-x-4">
-                    <img
-                      src={
-                        review.user.avatar || "https://via.placeholder.com/48"
-                      }
-                      alt={review.user.name}
-                      class="w-10 h-10 rounded-full object-cover"
-                    />
+                    <button
+                      onClick={() => props.onUserClick?.(review.user)}
+                      class="flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-full"
+                    >
+                      <img
+                        src={
+                          review.user.avatar || "https://via.placeholder.com/48"
+                        }
+                        alt={review.user.name}
+                        class="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                      />
+                    </button>
                     <div class="flex-1">
                       <div class="flex items-center justify-between mb-2">
                         <div>
-                          <h4 class="font-medium text-gray-900">
+                          <button
+                            onClick={() => props.onUserClick?.(review.user)}
+                            class="font-medium text-gray-900 hover:text-pink-600 transition-colors text-left"
+                          >
                             {review.user.name}
-                          </h4>
+                          </button>
                           <div class="flex items-center">
                             <For each={renderStars(review.rating)}>
                               {(star) => star}

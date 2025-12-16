@@ -5,6 +5,7 @@ import type { Product } from "../types";
 interface ProductCardProps {
   product: Product;
   onClick?: (product: Product) => void;
+  compact?: boolean;
 }
 
 const ProductCard: Component<ProductCardProps> = (props) => {
@@ -35,13 +36,19 @@ const ProductCard: Component<ProductCardProps> = (props) => {
         <img
           src={props.product.image}
           alt={props.product.name}
-          class="h-48 w-full object-cover object-center group-hover:opacity-75"
+          class={`${
+            props.compact ? "h-32" : "h-40"
+          } w-full object-cover object-center group-hover:opacity-75`}
         />
       </div>
 
-      <div class="p-4">
+      <div class={props.compact ? "p-3" : "p-4"}>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-gray-500 uppercase tracking-wide">
+          <span
+            class={`${
+              props.compact ? "text-xs" : "text-sm"
+            } text-gray-500 uppercase tracking-wide`}
+          >
             {props.product.brand}
           </span>
           <span class="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded-full">
@@ -49,7 +56,11 @@ const ProductCard: Component<ProductCardProps> = (props) => {
           </span>
         </div>
 
-        <h3 class="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
+        <h3
+          class={`${
+            props.compact ? "text-base" : "text-lg"
+          } font-medium text-gray-900 mb-2 line-clamp-2`}
+        >
           {props.product.name}
         </h3>
 

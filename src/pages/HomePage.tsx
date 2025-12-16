@@ -1,7 +1,21 @@
 import type { Component } from "solid-js";
 import { For, Show } from "solid-js";
 import ProductCard from "../components/ProductCard";
-import { appStore } from "../stores/appStore";
+import {
+  selectedCategory,
+  selectedGender,
+  sortBy,
+  filteredProducts,
+  paginatedProducts,
+  recommendedProducts,
+  currentUser,
+  totalPages,
+  currentPage,
+  handleCategoryChange,
+  handleGenderChange,
+  setSortBy,
+  setCurrentPage,
+} from "../stores/appStore";
 import type { Product } from "../types";
 
 interface HomePageProps {
@@ -21,33 +35,19 @@ const HomePage: Component<HomePageProps> = (props) => {
 
   return (
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Hero Section */}
-      <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">
-          Discover Your Perfect <span class="text-pink-600">Glow</span>
-        </h1>
-        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-          Find reliable reviews, compare prices, and get personalized cosmetic
-          recommendations from experts and real users.
-        </p>
-      </div>
-
       {/* Recommended Products */}
-      <Show
-        when={
-          appStore.currentUser() && appStore.recommendedProducts().length > 0
-        }
-      >
+      <Show when={currentUser() && recommendedProducts().length > 0}>
         <div class="mb-12">
           <h2 class="text-2xl font-bold text-gray-900 mb-6">
             Recommended For You
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <For each={appStore.recommendedProducts()}>
+            <For each={recommendedProducts()}>
               {(product) => (
                 <ProductCard
                   product={product}
                   onClick={props.onProductSelect}
+                  compact={true}
                 />
               )}
             </For>
@@ -55,14 +55,48 @@ const HomePage: Component<HomePageProps> = (props) => {
         </div>
       </Show>
 
+      {/* Gender Filter */}
+      <div class="flex justify-center gap-2 mb-4">
+        <button
+          onClick={() => handleGenderChange("all")}
+          class={`px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+            selectedGender() === "all"
+              ? "bg-purple-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          All
+        </button>
+        <button
+          onClick={() => handleGenderChange("women")}
+          class={`px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+            selectedGender() === "women"
+              ? "bg-purple-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          Women
+        </button>
+        <button
+          onClick={() => handleGenderChange("men")}
+          class={`px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+            selectedGender() === "men"
+              ? "bg-purple-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          Men
+        </button>
+      </div>
+
       {/* Category Filter */}
       <div class="flex flex-wrap justify-center gap-2 mb-8">
         <For each={categories}>
           {(category) => (
             <button
-              onClick={() => appStore.setSelectedCategory(category.value)}
-              class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                appStore.selectedCategory() === category.value
+              onClick={() => handleCategoryChange(category.value)}
+              class={`px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+                selectedCategory() === category.value
                   ? "bg-pink-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
@@ -77,18 +111,40 @@ const HomePage: Component<HomePageProps> = (props) => {
       <div>
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-2xl font-bold text-gray-900">
-            {appStore.selectedCategory() === "all"
+            {selectedCategory() === "all"
               ? "All Products"
-              : categories.find((c) => c.value === appStore.selectedCategory())
-                  ?.label}
+              : categories.find((c) => c.value === selectedCategory())?.label}
           </h2>
-          <span class="text-gray-600">
-            {appStore.filteredProducts().length} products
-          </span>
+          <div class="flex items-center gap-4">
+            <span class="text-gray-600">
+              {filteredProducts().length} products
+            </span>
+            <div class="flex items-center gap-2">
+              <label
+                for="sort"
+                class="text-sm font-medium text-gray-700 whitespace-nowrap"
+              >
+                Sort by:
+              </label>
+              <select
+                id="sort"
+                class="px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 text-sm cursor-pointer"
+                value={sortBy()}
+                onChange={(e) => setSortBy(e.currentTarget.value)}
+              >
+                <option value="featured">Featured</option>
+                <option value="name">Name (A-Z)</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+                <option value="reviews">Most Reviewed</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <Show
-          when={appStore.filteredProducts().length > 0}
+          when={paginatedProducts().length > 0}
           fallback={
             <div class="text-center py-12">
               <svg
@@ -114,7 +170,7 @@ const HomePage: Component<HomePageProps> = (props) => {
           }
         >
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <For each={appStore.filteredProducts()}>
+            <For each={paginatedProducts()}>
               {(product) => (
                 <ProductCard
                   product={product}
@@ -123,6 +179,68 @@ const HomePage: Component<HomePageProps> = (props) => {
               )}
             </For>
           </div>
+
+          {/* Pagination */}
+          <Show when={totalPages() > 1}>
+            <div class="mt-8 flex items-center justify-center gap-2">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage() - 1))}
+                disabled={currentPage() === 1}
+                class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+
+              <div class="flex gap-1">
+                <For
+                  each={Array.from({ length: totalPages() }, (_, i) => i + 1)}
+                >
+                  {(page) => (
+                    <Show
+                      when={
+                        page === 1 ||
+                        page === totalPages() ||
+                        (page >= currentPage() - 2 && page <= currentPage() + 2)
+                      }
+                    >
+                      <Show
+                        when={
+                          (page === currentPage() - 3 && page > 1) ||
+                          (page === currentPage() + 3 && page < totalPages())
+                        }
+                        fallback={
+                          <button
+                            onClick={() => setCurrentPage(page)}
+                            class={`w-10 h-10 rounded-lg ${
+                              currentPage() === page
+                                ? "bg-pink-600 text-white"
+                                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        }
+                      >
+                        <span class="w-10 h-10 flex items-center justify-center text-gray-500">
+                          ...
+                        </span>
+                      </Show>
+                    </Show>
+                  )}
+                </For>
+              </div>
+
+              <button
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages(), currentPage() + 1))
+                }
+                disabled={currentPage() === totalPages()}
+                class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+          </Show>
         </Show>
       </div>
 
