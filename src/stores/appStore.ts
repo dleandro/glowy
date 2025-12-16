@@ -27,7 +27,7 @@ const loadReviews = () => {
     try {
       const parsed = JSON.parse(storedReviews);
       // Convert date strings back to Date objects
-      return parsed.map((review: any) => ({
+      return parsed.map((review: Review) => ({
         ...review,
         createdAt: new Date(review.createdAt),
       }));
@@ -43,7 +43,7 @@ const allReviews = loadReviews();
 // Assign reviews to products
 allProducts.forEach((product) => {
   product.reviews = allReviews.filter(
-    (review) => review.productId === product.id
+    (review: Review) => review.productId === product.id
   );
 });
 
@@ -51,7 +51,7 @@ allProducts.forEach((product) => {
 const [products, setProducts] = createSignal<Product[]>(allProducts);
 const [currentUser, setCurrentUser] = createSignal<User | null>(null);
 const [reviews, setReviews] = createSignal<Review[]>(allReviews);
-const [influencerReviews, setInfluencerReviews] = createSignal<
+const [influencerReviews, _setInfluencerReviews] = createSignal<
   InfluencerReview[]
 >(mockInfluencerReviews);
 const [searchQuery, setSearchQuery] = createSignal<string>("");
@@ -199,16 +199,19 @@ const logoutUser = () => {
   localStorage.removeItem("currentUser");
 };
 
-const addReview = (productId: string, review: Omit<Review, "id">) => {
+const addReview = (
+  productId: string,
+  review: Omit<Review, "id" | "user" | "createdAt" | "helpfulVotes">
+) => {
   const user = currentUser();
   if (!user) return;
 
   const newReview: Review = {
+    ...review,
     id: `review-${Date.now()}`,
     createdAt: new Date(),
     helpfulVotes: 0,
     user: user,
-    ...review,
   };
   const updatedReviews = [...reviews(), newReview];
   setReviews(updatedReviews);
