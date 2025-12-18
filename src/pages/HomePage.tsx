@@ -34,11 +34,11 @@ const HomePage: Component<HomePageProps> = (props) => {
   ];
 
   return (
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
       {/* Recommended Products */}
       <Show when={currentUser() && recommendedProducts().length > 0}>
-        <div class="mb-12">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">
+        <div class="mb-8 sm:mb-12">
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
             Recommended For You
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -109,26 +109,26 @@ const HomePage: Component<HomePageProps> = (props) => {
 
       {/* All Products */}
       <div>
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-gray-900">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6">
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
             {selectedCategory() === "all"
               ? "All Products"
               : categories.find((c) => c.value === selectedCategory())?.label}
           </h2>
-          <div class="flex items-center gap-4">
-            <span class="text-gray-600">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+            <span class="text-sm sm:text-base text-gray-600">
               {filteredProducts().length} products
             </span>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
               <label
                 for="sort"
-                class="text-sm font-medium text-gray-700 whitespace-nowrap"
+                class="text-sm font-medium text-gray-700 whitespace-nowrap hidden sm:inline"
               >
                 Sort by:
               </label>
               <select
                 id="sort"
-                class="px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 text-sm cursor-pointer"
+                class="w-full sm:w-auto px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 text-sm cursor-pointer"
                 value={sortBy()}
                 onChange={(e) => setSortBy(e.currentTarget.value)}
               >
